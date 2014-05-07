@@ -1,0 +1,61 @@
+From afcb0d32a68865614fa1e3db670a656eb88c7f0e Mon Sep 17 00:00:00 2001
+From: CrysisLTU <jokubas.ver@gmail.com>
+Date: Sun, 16 Feb 2014 17:19:15 +0200
+Subject: [PATCH 1/1] Camera fixes for u8800pro.
+
+Change-Id: Iadafa4e7ff48a2fac8b9f0eff62c7238ad6f5e14
+---
+ camera/CameraParameters.cpp                        |    2 ++
+ include/camera/CameraParameters.h                  |    2 ++
+ .../camera/libcameraservice/api1/CameraClient.cpp  |    2 ++
+ 3 files changed, 6 insertions(+)
+
+diff --git a/camera/CameraParameters.cpp b/camera/CameraParameters.cpp
+index bb8cc75..b94766e 100644
+--- a/camera/CameraParameters.cpp
++++ b/camera/CameraParameters.cpp
+@@ -497,6 +497,8 @@ const char CameraParameters::SCENE_MODE_FALL_COLOR[] = "fall-color";
+ const char CameraParameters::SCENE_MODE_TEXT[] = "text";
+ #endif
+ 
++// add for huawei
++const char CameraParameters::SCENE_MODE_OFF[] = "off";
+ static const char* portrait = "portrait";
+ static const char* landscape = "landscape";
+ 
+diff --git a/include/camera/CameraParameters.h b/include/camera/CameraParameters.h
+index 2c069d0..af9dff9 100644
+--- a/include/camera/CameraParameters.h
++++ b/include/camera/CameraParameters.h
+@@ -820,6 +820,8 @@ public:
+     static const char SCENE_MODE_BACKLIGHT[];
+     static const char SCENE_MODE_FLOWERS[];
+     static const char SCENE_MODE_AR[];
++    // add for huawei
++    static const char SCENE_MODE_OFF[];
+ #endif
+     // Applications are looking for a barcode. Camera driver will be optimized
+     // for barcode reading.
+diff --git a/services/camera/libcameraservice/api1/CameraClient.cpp b/services/camera/libcameraservice/api1/CameraClient.cpp
+index afaf12a..772c952 100644
+--- a/services/camera/libcameraservice/api1/CameraClient.cpp
++++ b/services/camera/libcameraservice/api1/CameraClient.cpp
+@@ -711,6 +711,7 @@ status_t CameraClient::sendCommand(int32_t cmd, int32_t arg1, int32_t arg2) {
+         enableMsgType(CAMERA_MSG_STATS_DATA);
+     } else if (cmd == CAMERA_CMD_HISTOGRAM_OFF) {
+         disableMsgType(CAMERA_MSG_STATS_DATA);
++#if 0
+     } else if (cmd == CAMERA_CMD_METADATA_ON) {
+         enableMsgType(CAMERA_MSG_META_DATA);
+     } else if (cmd == CAMERA_CMD_METADATA_OFF) {
+@@ -718,6 +719,7 @@ status_t CameraClient::sendCommand(int32_t cmd, int32_t arg1, int32_t arg2) {
+     } else if ( cmd == CAMERA_CMD_LONGSHOT_ON ) {
+         mLongshotEnabled = true;
+     } else if ( cmd == CAMERA_CMD_LONGSHOT_OFF ) {
++#endif
+         mLongshotEnabled = false;
+         disableMsgType(CAMERA_MSG_SHUTTER);
+         disableMsgType(CAMERA_MSG_COMPRESSED_IMAGE);
+-- 
+1.7.9.5
+

@@ -1,0 +1,29 @@
+From 73601bc21dbf26222362c8ee9f5df91ae2e3790d Mon Sep 17 00:00:00 2001
+From: CrysisLTU <jokubas.ver@gmail.com>
+Date: Sun, 16 Feb 2014 17:20:40 +0200
+Subject: [PATCH 1/1] Fix for METADATA errors.
+
+Change-Id: I7ded4abd8759e71aa99156a1850a14a592abc65f
+---
+ core/jni/android_hardware_Camera.cpp |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/core/jni/android_hardware_Camera.cpp b/core/jni/android_hardware_Camera.cpp
+index 17967e0..a17b84e 100644
+--- a/core/jni/android_hardware_Camera.cpp
++++ b/core/jni/android_hardware_Camera.cpp
+@@ -716,9 +716,11 @@ static void android_hardware_Camera_setMetadataCb(JNIEnv *env, jobject thiz, jbo
+     if (camera == 0) return;
+ 
+     if(mode == true)
++ /* if 0
+         rc = camera->sendCommand(CAMERA_CMD_METADATA_ON, 0, 0);
+     else
+         rc = camera->sendCommand(CAMERA_CMD_METADATA_OFF, 0, 0);
++#endif */
+ 
+     if (rc != NO_ERROR) {
+         jniThrowException(env, "java/lang/RuntimeException", "set metadata mode failed");
+-- 
+1.7.9.5
+

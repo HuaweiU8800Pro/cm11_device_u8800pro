@@ -1,0 +1,13 @@
+#
+# system.prop for u8800PRO
+#
+
+rild.libpath=/system/lib/libril-qc-1.so
+rild.libargs=-d /dev/smd0
+ro.telephony.default_network=0
+ro.telephony.ril_class=HwQcomRIL
+mobiledata.interfaces=rmnet0,gprs,ppp0
+
+ro.confg.hw_appsbootversion=U8800PROVCM110_APPSBOOT
+ro.confg.hw_appversion=U8800PROVCM110_KERNEL
+ro.confg.hw_appfsversion=U8800PROVCM110_SYSIMG

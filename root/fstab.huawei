@@ -1,0 +1,24 @@
+#/boot			vfat	/dev/block/mmcblk0p1
+#/cust			vfat	/dev/block/mmcblk0p1
+#/recovery       	vfat	/dev/block/mmcblk0p1
+#/cache			ext4    /dev/block/mmcblk0p6	NULL					ext3
+#/system			ext4	/dev/block/mmcblk0p12   NULL					ext3
+#/data			ext4	/dev/block/mmcblk0p13	NULL					ext3
+#/sdcard			vfat	/dev/block/mmcblk1p1    /dev/block/mmcblk0p14
+#/emmc                   vfat    /dev/block/mmcblk0p14
+#/sd-ext			ext3	/dev/block/mmcblk1p2
+
+#dev_mount sdcard /storage/sdcard1 auto /devices/platform/msm_sdcc.4/mmc_host
+#dev_mount emmc /storage/sdcard0 14 /devices/platform/msm_sdcc.2/mmc_host
+
+/dev/block/mmcblk0p12       /system         ext4    ro,barrier=1                                                    wait
+/dev/block/mmcblk0p6        /cache          ext4    noatime,nosuid,nodev,barrier=1,data=ordered                     wait,check
+/dev/block/mmcblk0p13       /data           ext4    noatime,nosuid,nodev,barrier=1,data=ordered,noauto_da_alloc     wait,check
+/dev/block/mmcblk0p1        /boot           vfat    defaults                                                        defaults
+/dev/block/mmcblk0p1        /recovery       vfat    defaults                                                        defaults
+
+/devices/platform/msm_sdcc.4/mmc_host auto      auto    defaults    voldmanaged=sdcard1:auto
+/devices/platform/msm_sdcc.2/mmc_host auto      auto    defaults    voldmanaged=sdcard0:14,noemulatedsd
+
+# zRAM
+/dev/block/zram0            none            swap    defaults        zramsize=52428800

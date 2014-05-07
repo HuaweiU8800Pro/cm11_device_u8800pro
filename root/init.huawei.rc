@@ -1,0 +1,419 @@
+import init.huawei.usb.rc
+
+on init
+# Set permissions for persist partition
+    mkdir /persist 0771 system system
+    mkdir /storage 0775 system system
+    mkdir /storage/sdcard1 0700 root root
+    mkdir /storage/sdcard0 0700 root root
+    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
+    mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
+     
+    export EXTERNAL_STORAGE /storage/sdcard1
+    export SECONDARY_STORAGE /storage/sdcard0
+
+    symlink /storage/sdcard1 /mnt/sdcard
+    symlink /storage/sdcard1 /sdcard
+    symlink /storage/sdcard0 /mnt/emmc
+    symlink /storage/sdcard0 /HWUserData
+
+on boot
+    exec system/bin/btnvtool -O
+    mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
+    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    chown system system /sys/module/sco/parameters/disable_esco
+    chown bluetooth bluetooth /sys/module/hci_smd/parameters/hcismd_set
+    chmod 0660 /sys/module/bluetooth_power/parameters/power
+    chmod 0660 /sys/module/hci_smd/parameters/hcismd_set
+    chmod 0660 /sys/class/rfkill/rfkill0/state
+    chmod 0660 /proc/bluetooth/sleep/proto
+    chmod 0660 /proc/bluetooth/clock/proto
+    chown bluetooth bluetooth /dev/ttyHS0
+    chmod 0660 /dev/ttyHS0
+    chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
+    chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
+
+# Create the directories used by the Wireless subsystem
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/load 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
+    chown dhcp dhcp /data/misc/dhcp
+    setprop wifi.interface eth0
+
+# Enable Bluetooth 802.11 PAL when Bluetooth is turned on
+    setprop ro.config.bt.amp no
+
+# allow system to modify ksm control files
+#    chown root system /sys/kernel/mm/ksm/pages_to_scan
+#    chmod 0664 /sys/kernel/mm/ksm/pages_to_scan
+#    chown root system /sys/kernel/mm/ksm/sleep_millisecs
+#    chmod 0664 /sys/kernel/mm/ksm/sleep_millisecs
+#    chown root system /sys/kernel/mm/ksm/run
+#    chmod 0664 /sys/kernel/mm/ksm/run
+#    write /sys/kernel/mm/ksm/sleep_millisecs 1500
+#    write /sys/kernel/mm/ksm/pages_to_scan 256
+
+# lines from original source.android.com
+write /sys/kernel/mm/ksm/pages_to_scan 100
+write /sys/kernel/mm/ksm/sleep_millisecs 500
+write /sys/kernel/mm/ksm/run 1
+
+write /proc/sys/vm/page-cluster 0
+
+# Vibrator intensity control
+    chown system system /sys/class/timed_output/vibrator/voltage_level
+
+#port-bridge
+    chmod 0660 /dev/smd0
+    chown system system /dev/smd0
+
+    chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
+
+# create symlink for fb1 as HDMI
+    symlink /dev/graphics/fb1 /dev/graphics/hdmi
+
+# Remove write permissions to video related nodes
+    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
+    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
+    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
+
+# Change owner and group for media server and surface flinger
+    chown system system /sys/devices/virtual/graphics/fb1/format_3d
+
+#For bridgemgr daemon to inform the USB driver of the correct transport
+    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
+
+# To allow interfaces to get v6 address when tethering is enabled
+    write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet3/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet4/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
+
+    chmod 0664 /dev/light
+    chmod 0664 /dev/proximity
+    chmod 0664 /dev/accel
+    chmod 0664 /dev/compass_aot
+    chmod 0664 /dev/akm8975_dev
+    chmod 0664 /dev/compass_dev
+    chmod 0664 /dev/gyro
+
+    chown radio system /sys/class/leds/ptt_led/brightness
+
+    chown system system /sys/kernel/logger/log_main/enable
+    chown system system /sys/kernel/logger/log_events/enable
+    chown system system /sys/kernel/logger/log_radio/enable
+    chown system system /sys/kernel/logger/log_main/priority
+    chown system system /sys/kernel/logger/log_events/priority
+    chown system system /sys/kernel/logger/log_radio/priority
+
+    chown system system /sys/devices/platform/mmi_key_dev/keytest
+
+    chmod 664 /dev/input/event1
+    chmod 664 /dev/input/event2
+    chmod 664 /dev/input/event2
+    chmod 664 /dev/input/event3
+    chmod 664 /dev/input/event4
+    chmod 664 /dev/input/event5
+    chmod 664 /dev/input/event6
+
+# For bridgemgr daemon to inform the USB driver of the correct transport
+    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
+
+    chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
+    chmod 0660 /sys/class/android_usb/android0/f_rndis/ethaddr
+    chown system system /sys/devices/platform/msm_hsusb/gadget/fixusb
+    chown system system /sys/class/android_usb/android0/f_rndis/ethaddr
+
+    setprop net.tcp.buffersize.hsupa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hsdpa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.evdo_b  4094,87380,262144,4096,16384,262144
+
+# Assign TCP buffer thresholds to be ceiling value of technology maximums
+# Increased technology maximums should be reflected here.
+    write /proc/sys/net/core/rmem_max  1220608
+    write /proc/sys/net/core/wmem_max  1220608
+
+    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
+    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
+
+on emmc-fs
+# mount mmc partitions
+    wait /dev/block/mmcblk0p12
+    mount ext4 /dev/block/mmcblk0p12 /system ro barrier=1
+    wait /dev/block/mmcblk0p13
+    exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
+    mount ext4 /dev/block/mmcblk0p13 /data nosuid nodev barrier=1 noauto_da_alloc
+    mount ext4 /dev/block/mmcblk0p6 /cache nosuid nodev barrier=1
+    write /sys/module/block2mtd/parameters/block2mtd /dev/block/mmcblk0p7
+    wait /dev/block/mmcblk0p14
+    mount vfat /dev/block/mmcblk0p14 /storage/internal_sd uid=1000,gid=1015,umask=0002,utf8
+    mkdir /.cust_backup
+    mount vfat /dev/block/mmcblk0p1 /.cust_backup rw wait
+    mkdir /cust 
+    mount ext4 loop@.cust_backup/image/cust.img /cust rw
+    
+    swapon_all ./fstab.huawei
+
+on post-fs
+    copy /proc/modem_panic /data/dontpanic/modem_panic
+    chown root log /data/dontpanic/modem_panic
+    chmod 0640 /data/dontpanic/modem_panic
+
+# msm specific files that need to be created on /data
+on post-fs-data
+    mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
+
+    chmod 0666 /sys/class/rfkill/rfkill0/state
+    mkdir /data/misc/bluetoothd/bluedroid 0776 bluetooth system 
+
+    rm /data/misc/bluetoothd/bluedroid/bluedroid_ref 
+    write /data/misc/bluetoothd/bluedroid/bluedroid_ref  0
+    chown bluetooth system /data/misc/bluetoothd/bluedroid/bluedroid_ref
+    chmod 0776 /data/misc/bluetoothd/bluedroid/bluedroid_ref
+
+    write /data/btaddr 0
+    chown bluetooth system /data/btaddr
+    chmod 0660 /data/btaddr
+
+# Chown polling nodes as needed from UI running on system server
+    chown system system /persist
+    chmod 0771 /persist
+    chmod 0664 /sys/devices/platform/msm_sdcc.1/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.2/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.3/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.4/polling
+
+    # Chown polling nodes as needed from UI running on system server
+    chown system system /sys/devices/platform/msm_sdcc.1/polling
+    chown system system /sys/devices/platform/msm_sdcc.2/polling
+    chown system system /sys/devices/platform/msm_sdcc.3/polling
+    chown system system /sys/devices/platform/msm_sdcc.4/polling
+
+# Create directories for wiper services
+    mkdir /data/wpstiles/ 0755 shell
+    mkdir /data/wiper 0755 location qcom_oncrpc
+
+    chmod 0666 /proc/cmdline
+    setprop vold.post_fs_data_done 1
+
+service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11 /dev/block/mmcblk0p17
+    class main
+    user root
+    disabled
+
+service bridgemgrd /system/bin/bridgemgrd
+    class main
+    user radio
+    group radio
+    disabled
+
+service qmiproxy /system/bin/qmiproxy
+    class main
+    user radio
+    group radio
+    disabled
+
+service qmuxd /system/bin/qmuxd
+    class main
+    user radio
+    group radio
+    disabled
+
+service netmgrd /system/bin/netmgrd
+    class main
+
+service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
+    -Dwext -ieth0 -c/data/misc/wifi/wpa_supplicant.conf \
+    -O/data/misc/wifi/sockets \
+    -e/data/misc/wifi/entropy.bin \
+    -g@android:wpa_eth0
+
+    class late_start
+    user root
+    group wifi inet
+    socket wpa_eth0 dgram 660 wifi wifi
+    disabled
+    oneshot
+
+service hciattach /system/bin/brcm_patchram_plus -d --enable_hci --enable_lpm --baudrate 3000000 --patchram /etc/firmware/BCM4329.hcd /dev/ttyHS0
+    user bluetooth
+    group qcom_oncrpc bluetooth net_bt_admin
+    disabled
+    oneshot
+
+#Bluetooth new by des
+
+on property:init.svc.bluetoothd=running
+    write /sys/class/bluetooth/hci0/idle_timeout 7000
+
+service setbtmac /system/bin/setbtmac
+    class main
+    oneshot
+
+service pcm-bridge /system/bin/pcm-bridge /dev/smd7 /dev/ttyGS1
+
+service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
+    class main
+    disabled
+    oneshot
+
+service sapd /system/bin/sdptool add --channel=15 SAP
+    class main
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service dund /system/bin/sdptool add --channel=1 DUN
+    class main
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service ftp /system/bin/sdptool add --psm=5257 --channel=20 FTP
+    class main
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service map0 /system/bin/sdptool add --channel=16 MAS0
+    class main
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service map1 /system/bin/sdptool add --channel=17 MAS1
+    class main
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service dhcpcd_eth0 /system/bin/dhcpcd -aABDKL
+    disabled
+    oneshot
+
+service dhcpcd_p2p /system/bin/dhcpcd -ABKLG
+    class late_start
+    disabled
+    oneshot
+
+service iprenew_eth0 /system/bin/dhcpcd -n
+    class main
+    disabled
+    oneshot
+
+service iprenew_p2p /system/bin/dhcpcd -n p2p
+    class late_start
+    disabled
+    oneshot
+
+service dhcpcd_bnep0 /system/bin/dhcpcd -ABKLG
+    disabled
+    oneshot
+
+service oem_rpc_svc /system/bin/oem_rpc_svc
+    class main
+    oneshot
+
+service compassd /system/bin/compassd
+    class main
+    disabled
+    oneshot
+
+service akm8975 /system/bin/akmd8975
+    class main
+    disabled
+    oneshot
+
+service akm8962 /system/bin/akmd8962
+    class main
+    disabled
+    oneshot
+
+service rmt_oeminfo /system/bin/rmt_oeminfo
+    class main
+    user root
+    oneshot
+
+service qcom-sh /system/bin/sh /init.qcom.sh
+    class main
+    user root
+    oneshot
+
+on property:ro.baseband="msm"
+    start port-bridge
+# Enable BT-DUN only for all msms
+    setprop ro.qualcomm.bluetooth.dun true
+
+on property:ro.baseband="unknown"
+    start port-bridge
+
+# Wifi - Tethering
+on property:init.svc.wpa_supplicant=stopped
+    stop dhcpcd
+
+on property:wlan.driver.status=unloaded
+    start hwmac
+
+service hwmac /system/bin/hwmac
+    class main
+    oneshot
+
+service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+
+on property:ro.emmc=1
+    start rmt_oeminfo
+    start rmt_storage
+    
+service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
+     class late_start
+     disabled    
+
+on property:ro.use_data_netmgrd=false
+# netmgr not supported on specific target
+    stop netmgrd
+
+# FUSE sdcard daemon for rich permissions (runs as media_rw)
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class late_start
+    disabled
+
+service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
+    class late_start
+    disabled
+
+service fuse_usbdisk0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk0 /storage/usbdisk0
+    class late_start
+    disabled
