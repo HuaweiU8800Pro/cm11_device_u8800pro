@@ -14,5 +14,6 @@
 # limitations under the License.
 #
 
+add_lunch_combo full_u8800pro-userdebug
 add_lunch_combo cm_u8800pro-userdebug
-sh device/huawei/u8800pro/patches/apply.sh
+#sh device/huawei/u8800pro/patches/apply.sh

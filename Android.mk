@@ -16,11 +16,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# Hack for build
-$(shell mkdir -p $(OUT)/obj/SHARED_LIBRARIES/libhwrpc_intermediates)
-$(shell touch $(OUT)/obj/SHARED_LIBRARIES/libhwrpc_intermediates/export_includes)
-$(shell mkdir -p $(OUT)/obj/KERNEL_OBJ/usr)
-
 ifeq ($(TARGET_BOOTLOADER_BOARD_NAME),u8800pro)
 include $(call first-makefiles-under,$(call my-dir))
 endif

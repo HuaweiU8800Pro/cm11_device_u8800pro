@@ -14,11 +14,16 @@
 # limitations under the License.
 #
 
-# Inherit from the proprietary version if exists
--include vendor/huawei/u8800pro/BoardConfigVendor.mk
+# WARNING: This line must come *before* including the proprietary
+# variant, so that it gets overwritten by the parent (which goes
+# against the traditional rules of inheritance).
+# The proprietary variant sets USE_CAMERA_STUB := false, this way
+# we use the camera stub when the vendor tree isn't present, and
+# the true camera library when the vendor tree is available.
+USE_CAMERA_STUB := true
 
-USE_CAMERA_STUB := false
-#BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
+# Inherit from the proprietary version if exists
+include vendor/huawei/u8800pro/BoardConfigVendor.mk
 
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
@@ -39,58 +44,59 @@ TARGET_NO_RADIOIMAGE := true
 BOARD_WANTS_EMMC_BOOT := true
 
 # without this line display is synced with unbearably low framerate 
-TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
+#TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
 
 # needed for camera 
-COMMON_GLOBAL_CFLAGS += -DQCOM_NO_SECURE_PLAYBACK
-COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
+#COMMON_GLOBAL_CFLAGS += -DQCOM_NO_SECURE_PLAYBACK
+#COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 
 # Camera
-BOARD_NEEDS_MEMORYHEAPPMEM := true
-COMMON_GLOBAL_CFLAGS += -DICS_CAMERA_BLOB
-BOARD_USES_QCOM_LEGACY_CAM_PARAMS := true
-CAMERA_USES_SURFACEFLINGER_CLIENT_STUB := true
-BOARD_USES_LEGACY_CAMERA := true
-TARGET_DISABLE_ARM_PIE := true
-BOARD_USES_PMEM_ADSP := true
+#BOARD_NEEDS_MEMORYHEAPPMEM := true
+#COMMON_GLOBAL_CFLAGS += -DICS_CAMERA_BLOB
+#BOARD_USES_QCOM_LEGACY_CAM_PARAMS := true
+#CAMERA_USES_SURFACEFLINGER_CLIENT_STUB := true
+#BOARD_USES_LEGACY_CAMERA := true
+#TARGET_DISABLE_ARM_PIE := true
+#BOARD_USES_PMEM_ADSP := true
 
 #screenshot & app preview fix
-BOARD_USE_MHEAP_SCREENSHOT := true
-TARGET_DISPLAY_INSECURE_MM_HEAP := true
+#BOARD_USE_MHEAP_SCREENSHOT := true
+#TARGET_DISPLAY_INSECURE_MM_HEAP := true
 
 TARGET_OTA_ASSERT_DEVICE := u8800pro,U8800PRO
 
 # Qualcomm Hardware
 BOARD_USES_QCOM_HARDWARE := true
-#TARGET_USES_QCOM_BSP := true
+TARGET_USES_QCOM_BSP := true
 TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
-TARGET_QCOM_DISPLAY_VARIANT := legacy
-TARGET_QCOM_MEDIA_VARIANT := legacy
+TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_QCOM_MEDIA_VARIANT := caf
 
 # Graphics
 USE_OPENGL_RENDERER := true
-TARGET_USES_ION := false
+TARGET_USES_ION := true
 TARGET_USES_C2D_COMPOSITION := true
-COMMON_GLOBAL_CFLAGS += -DREFRESH_RATE=60 -DQCOM_HARDWARE
+# COMMON_GLOBAL_CFLAGS += -DREFRESH_RATE=60 -DQCOM_HARDWARE #na dw ti frames 8a xw xwris auto
 TARGET_DISPLAY_USE_RETIRE_FENCE := true
 TARGET_DISPLAY_INSECURE_MM_HEAP := true
 BOARD_USES_PMEM_ADSP := true
 BOARD_EGL_CFG := device/huawei/u8800pro/egl.cfg
-TARGET_NO_HW_VSYNC := true
-BOARD_EGL_WORKAROUND_BUG_10194508 := true
+#TARGET_NO_HW_VSYNC := true
+#BOARD_EGL_WORKAROUND_BUG_10194508 := true
 
 # Audio
 TARGET_QCOM_AUDIO_VARIANT := caf
 BOARD_USES_LEGACY_ALSA_AUDIO := true
+BOARD_USES_QCOM_AUDIO_CALIBRATION := true
 
 # Web Rendering
-ENABLE_WEBGL := true
+#ENABLE_WEBGL := true
 
 #uncomment the following line only when rebuilding without cleaning first
 #PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
 
 # HACK: Use old Webkit for pmem compatibility
-TARGET_FORCE_CPU_UPLOAD := true
+#TARGET_FORCE_CPU_UPLOAD := true
 
 # RIL
 BOARD_RIL_CLASS := ../../../device/huawei/u8800pro/RIL/
@@ -130,10 +136,10 @@ BOARD_GPS_LIBRARIES := libloc_api
 TARGET_PROVIDES_LIBLIGHT := true
 
 # Kernel
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.4.3
-TARGET_KERNEL_SOURCE := kernel/huawei/u8800pro
-TARGET_KERNEL_CONFIG := u8800pro_defconfig
-BOARD_KERNEL_CMDLINE := console=ttyDCC0 androidboot.hardware=huawei androidboot.selinux=permissive
+#TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.4.3
+TARGET_KERNEL_SOURCE := kernel/huawei/u8800
+TARGET_KERNEL_CONFIG := u8800_defconfig
+BOARD_KERNEL_CMDLINE := console=ttyDCC0 androidboot.hardware=qcom androidboot.selinux=permissive
 BOARD_INSTALLER_CMDLINE := $(BOARD_KERNEL_CMDLINE)
 BOARD_KERNEL_BASE := 0x00200000
 BOARD_KERNEL_PAGESIZE := 4096
@@ -159,7 +165,7 @@ RECOVERY_CHARGEMODE := true
 BOARD_UMS_LUNFILE := "/sys/class/android_usb/android0/f_mass_storage/lun0/file"
 TARGET_RECOVERY_INITRC := device/huawei/u8800pro/recovery/recovery.rc
 BOARD_RECOVERY_RMT_STORAGE := true
-TARGET_RECOVERY_FSTAB            := device/huawei/u8800pro/root/fstab.huawei
+TARGET_RECOVERY_FSTAB            := device/huawei/u8800pro/root/fstab.qcom
 RECOVERY_FSTAB_VERSION           := 2
 
 # Custom releasetools for old partition table.
@@ -172,24 +178,4 @@ TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 
 TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := ./device/huawei/u8800pro/releasetools/ota_from_target_files
-
-# SELinux
-BOARD_SEPOLICY_DIRS := \
-device/huawei/msm7x30-common/sepolicy
-
-BOARD_SEPOLICY_UNION := \
-        file_contexts \
-        genfs_contexts \
-        app.te \
-        btmacreader.te \
-        device.te \
-        drmserver.te \
-        init_shell.te \
-        file.te \
-        rild.te \
-        sensors_config.te \
-        shell.te \
-        surfaceflinger.te \
-        system.te \
-        zygote.te
 

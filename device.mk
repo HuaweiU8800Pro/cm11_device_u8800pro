@@ -18,7 +18,7 @@
 $(call inherit-product, device/common/gps/gps_eu_supl.mk)
 
 # Include proprietary stuff
-$(call inherit-product-if-exists, vendor/huawei/u8800pro/u8800pro-vendor.mk)
+$(call inherit-product, vendor/huawei/u8800pro/u8800pro-vendor.mk)
 
 # Use standard dalvik heap sizes
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
@@ -46,11 +46,11 @@ PRODUCT_COPY_FILES += \
 
 # init
 PRODUCT_COPY_FILES += \
-    device/huawei/u8800pro/root/init.huawei.rc:root/init.huawei.rc \
-    device/huawei/u8800pro/root/init.huawei.usb.rc:root/init.huawei.usb.rc \
-    device/huawei/u8800pro/root/ueventd.huawei.rc:root/ueventd.huawei.rc \
+    device/huawei/u8800pro/root/init.qcom.rc:root/init.qcom.rc \
+    device/huawei/u8800pro/root/init.qcom.usb.rc:root/init.qcom.usb.rc \
+    device/huawei/u8800pro/root/ueventd.qcom.rc:root/ueventd.qcom.rc \
     device/huawei/u8800pro/root/init.qcom.sh:root/init.qcom.sh \
-    device/huawei/u8800pro/root/fstab.huawei:root/fstab.huawei    
+    device/huawei/u8800pro/root/fstab.qcom:root/fstab.qcom    
     
 # ETC
 PRODUCT_COPY_FILES += \
@@ -184,7 +184,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.egl.hw=1 \
     com.qc.hardware=true \
     DEVICE_PROVISIONED=1 \
-    persist.webview.provider=classic \
     ro.sf.lcd_density=240 \
     ro.config.low_ram=true \
     dalvik.vm.jit.codecachesize=0
