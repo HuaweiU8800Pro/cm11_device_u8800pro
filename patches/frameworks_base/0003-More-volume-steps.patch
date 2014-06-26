@@ -1,0 +1,30 @@
+From e34539b03d75f8c386c940d8eef302b53144f3bd Mon Sep 17 00:00:00 2001
+From: CrysisLTU <jokubas.ver@gmail.com>
+Date: Thu, 26 Jun 2014 20:08:24 +0300
+Subject: [PATCH 1/1] More volume steps
+
+Change-Id: Ic78b2865440edcbf400ebc11256259a4176bd91a
+---
+ media/java/android/media/AudioService.java |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/media/java/android/media/AudioService.java b/media/java/android/media/AudioService.java
+index 860d81e..c0fc125 100644
+--- a/media/java/android/media/AudioService.java
++++ b/media/java/android/media/AudioService.java
+@@ -213,10 +213,10 @@ public class AudioService extends IAudioService.Stub {
+ 
+    /** @hide Maximum volume index values for audio streams */
+     private static final int[] MAX_STREAM_VOLUME = new int[] {
+-        5,  // STREAM_VOICE_CALL
++        7,  // STREAM_VOICE_CALL
+         7,  // STREAM_SYSTEM
+         7,  // STREAM_RING
+-        15, // STREAM_MUSIC
++        30, // STREAM_MUSIC
+         7,  // STREAM_ALARM
+         7,  // STREAM_NOTIFICATION
+         15, // STREAM_BLUETOOTH_SCO
+-- 
+1.7.9.5
+

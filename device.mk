@@ -200,7 +200,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # system prop for opengles version
 PRODUCT_PROPERTY_OVERRIDES += \
-    debug.composition.type=dyn \
+    debug.composition.type=gpu \
     debug.hwc.fakevsync=1 \
     ro.opengles.version=131072 \
     debug.egl.recordable.rgba8888=1 \
@@ -212,7 +212,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.webview.provider=classic \
     ro.sf.lcd_density=240 \
     ro.config.low_ram=true \
-    dalvik.vm.jit.codecachesize=0
+    dalvik.vm.jit.codecachesize=0 \
+    ro.ksm.default=1
 
 # Wi-Fi
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -230,7 +231,13 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.camera.landscape=true \
-    debug.camcorder.disablemeta=0
+    debug.camcorder.disablemeta=0 \
+    ro.media.panorama.defres=3264x1840 \
+    ro.media.enc.jpeg.quality=100
+    
+# Enable Adaptive Multi-Rate Wideband
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.ril.enable.amr.wideband=1
     
 # BLUETOOTH
 PRODUCT_COPY_FILES += \
