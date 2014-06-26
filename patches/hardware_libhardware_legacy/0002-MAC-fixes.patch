@@ -1,0 +1,179 @@
+From 1e28a97c50961358112d71946c8e8de3b2431fce Mon Sep 17 00:00:00 2001
+From: CrysisLTU <jokubas.ver@gmail.com>
+Date: Tue, 17 Jun 2014 23:21:38 +0300
+Subject: [PATCH 1/1] MAC fixes
+
+Change-Id: I61148ea7e5af4f2a5b63c31518d200e5e256efd3
+---
+ wifi/Android.mk |    2 +-
+ wifi/wifi.c     |  105 +++++++++++++++++++++++++++++--------------------------
+ 2 files changed, 57 insertions(+), 50 deletions(-)
+
+diff --git a/wifi/Android.mk b/wifi/Android.mk
+index 7f92c8d..055ab1a 100644
+--- a/wifi/Android.mk
++++ b/wifi/Android.mk
+@@ -47,7 +47,7 @@ LOCAL_CFLAGS += -DSAMSUNG_WIFI
+ endif
+ 
+ ifeq ($(BOARD_USE_HUAWEI_BCM_WIFI),true)
+- LOCAL_CFLAGS += -DHUAWEI_BCM_WIFI
++    LOCAL_CFLAGS += -DHUAWEI_BCM_WIFI
+ endif
+ 
+ LOCAL_SHARED_LIBRARIES += libnetutils libhwrpc
+diff --git a/wifi/wifi.c b/wifi/wifi.c
+index d1e0d0a..1a7f528 100644
+--- a/wifi/wifi.c
++++ b/wifi/wifi.c
+@@ -143,6 +143,10 @@ static unsigned char dummy_key[21] = { 0x02, 0x11, 0xbe, 0x33, 0x43, 0x35,
+                                        0x1c, 0xd3, 0xee, 0xff, 0xf1, 0xe2,
+                                        0xf3, 0xf4, 0xf5 };
+ 
++#ifdef HUAWEI_BCM_WIFI
++extern void huawei_oem_rapi_streaming_function(int n, int p1, int p2, int p3, int *v1, int *v2, int *v3);
++void sertomac(char *sernum, char *mac_addr);
++#endif
+ /* Is either SUPPLICANT_NAME or P2P_SUPPLICANT_NAME */
+ static char supplicant_name[PROPERTY_VALUE_MAX];
+ /* Is either SUPP_PROP_NAME or P2P_PROP_NAME */
+@@ -151,50 +155,61 @@ static char supplicant_prop_name[PROPERTY_KEY_MAX];
+ #ifdef HUAWEI_BCM_WIFI
+ void getmac(char *mac_param)
+ {
+- char x[8];
+- int y;
+- char sernum[PROPERTY_VALUE_MAX];
+- char mac_addr[PROPERTY_VALUE_MAX];
+- property_get("ro.serialno", sernum, NULL);
+- if(sernum != NULL){
+- sertomac(sernum,mac_addr);
+- sprintf(mac_param,"mac_param=%s %s", mac_addr, DRIVER_MODULE_ARG);
+- }else{
+- memset(x,0,8);
+- y=0;
+- huawei_oem_rapi_streaming_function(3,0,0,0,0,&y,x);
+- ALOGV("huawei_oem_rapi_streaming_function %p %x %x",x,x[0],y);
+- sprintf(mac_param,"mac_param=%02X:%02X:%02X:%02X:%02X:%02X %s",x[5],x[4],x[3],x[2],x[1],x[0],DRIVER_MODULE_ARG);
+- }
+- ALOGI("Got MAC Address: %s ",mac_param);
++    char x[8];
++    int  y;
++	char sernum[PROPERTY_VALUE_MAX];
++	char mac_addr[PROPERTY_VALUE_MAX];
++		property_get("ro.serialno", sernum, NULL);
++	if(sernum != NULL){
++		sertomac(sernum,mac_addr);
++		sprintf(mac_param,"mac_param=%s %s", mac_addr, DRIVER_MODULE_ARG);
++	}else{
++		memset(x,0,8);
++		y=0;
++		huawei_oem_rapi_streaming_function(3,0,0,0,0,&y,x);
++		ALOGV("huawei_oem_rapi_streaming_function %p %x %x",x,x[0],y);
++		sprintf(mac_param,"mac_param=%02X:%02X:%02X:%02X:%02X:%02X %s",x[5],x[4],x[3],x[2],x[1],x[0],DRIVER_MODULE_ARG);
++	}
++    ALOGI("Got MAC Address: %s ",mac_param);
+ }
+ 
+ void sertomac(char *sernum, char *mac_addr)
+ {
+- int len,i;
+-
+- len = strlen(sernum);
+-
+- sernum[len-1]++;
+-
+- for(i=1;i<len;i++){
+- if(sernum[len-i] > 'F'){
+- sernum[len-i] = '0';
+- sernum[len-i-1]++;
+- }
+- }
+- ALOGV("result is %s", sernum);
+- sprintf(mac_addr,"%c%c:%c%c:%c%c:%c%c:%c%c:%c%c", \
+- sernum[0], sernum[1], \
+- sernum[2], sernum[3], \
+- sernum[4], sernum[5], \
+- sernum[6], sernum[7], \
+- sernum[8], sernum[9], \
+- sernum[10], sernum[11]);
+- ALOGV("MAC Address is %s", mac_addr);
++	int len,i;
++
++	len = strlen(sernum);
++
++	sernum[len-1]++;
++
++	for(i=1;i<len;i++){
++		if(sernum[len-i] > 'F'){
++			sernum[len-i] = '0';
++			sernum[len-i-1]++;
++		}
++	}	
++	ALOGV("result is %s", sernum);	
++    sprintf(mac_addr,"%c%c:%c%c:%c%c:%c%c:%c%c:%c%c", \
++	sernum[0], sernum[1], \
++	sernum[2], sernum[3], \
++	sernum[4], sernum[5], \
++	sernum[6], sernum[7], \
++	sernum[8], sernum[9], \
++	sernum[10], sernum[11]);	
++	ALOGV("MAC Address is %s", mac_addr);
+ }
+ #endif
+ 
++
++static int is_primary_interface(const char *ifname)
++{
++    //Treat NULL as primary interface to allow control
++    //on STA without an interface
++    if (ifname == NULL || !strncmp(ifname, primary_iface, strlen(primary_iface))) {
++        return 1;
++    }
++    return 0;
++}
++
+ #ifdef SAMSUNG_WIFI
+ char* get_samsung_wifi_type()
+ {
+@@ -343,11 +358,10 @@ int wifi_load_driver()
+         return -1;
+     usleep(200000);
+ #endif
+-
+ #ifdef HUAWEI_BCM_WIFI
+- char mac_param[64];
+- getmac(mac_param);
+- if (insmod(DRIVER_MODULE_PATH, mac_param) < 0) {
++    char mac_param[64];
++		getmac(mac_param);
++    if (insmod(DRIVER_MODULE_PATH, mac_param) < 0) {
+ #else
+     if (insmod(DRIVER_MODULE_PATH, DRIVER_MODULE_ARG) < 0) {
+ #endif
+@@ -373,7 +387,7 @@ int wifi_load_driver()
+         if (property_get(DRIVER_PROP_NAME, driver_status, NULL)) {
+             if (strcmp(driver_status, "ok") == 0)
+                 return 0;
+-            else if (strcmp(driver_status, "failed") == 0) {
++            else if (strcmp(DRIVER_PROP_NAME, "failed") == 0) {
+                 wifi_unload_driver();
+                 return -1;
+             }
+@@ -940,13 +954,6 @@ int wifi_stop_supplicant(int p2p_supported)
+         return 0;
+     }
+ 
+-#ifdef USES_TI_MAC80211
+-    if (p2p_supported && add_remove_p2p_interface(0) < 0) {
+-        ALOGE("Wi-Fi - could not remove p2p interface");
+-        return -1;
+-    }
+-#endif
+-
+     property_set("ctl.stop", supplicant_name);
+     sched_yield();
+ 
+-- 
+1.7.9.5
+

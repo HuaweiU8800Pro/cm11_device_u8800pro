@@ -35,6 +35,11 @@ TARGET_BOOTLOADER_BOARD_NAME := u8800pro
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
 
+TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
+TARGET_USE_SCORPION_PLD_SET := true
+TARGET_SCORPION_BIONIC_PLDOFFS := 6
+TARGET_SCORPION_BIONIC_PLDSIZE := 128
+
 # this line is needed in order to pass huawei logo
 BOARD_WANTS_EMMC_BOOT := true
 
@@ -53,6 +58,7 @@ CAMERA_USES_SURFACEFLINGER_CLIENT_STUB := true
 BOARD_USES_LEGACY_CAMERA := true
 TARGET_DISABLE_ARM_PIE := true
 BOARD_USES_PMEM_ADSP := true
+BOARD_USES_CAMERA_FAST_AUTOFOCUS := true
 
 #screenshot & app preview fix
 BOARD_USE_MHEAP_SCREENSHOT := true
@@ -82,6 +88,8 @@ BOARD_EGL_WORKAROUND_BUG_10194508 := true
 # Audio
 TARGET_QCOM_AUDIO_VARIANT := caf
 BOARD_USES_LEGACY_ALSA_AUDIO := true
+BOARD_QCOM_TUNNEL_LPA_ENABLED := false
+BOARD_QCOM_VOIP_ENABLED := true
 
 # Web Rendering
 ENABLE_WEBGL := true
@@ -112,7 +120,8 @@ WIFI_DRIVER_FW_PATH_AP           := "/system/vendor/firmware/fw_bcm4329_apsta.bi
 WIFI_DRIVER_MODULE_ARG           := "firmware_path=/system/vendor/firmware/fw_bcm4329.bin nvram_path=/system/vendor/firmware/nvram.txt"
 # flag for huawei
 BOARD_USE_HUAWEI_BCM_WIFI := true
-# BOARD_USE_SERNUM_FOR_MAC := true fix for null mac
+# Fix fur null WiFi MAC
+BOARD_USE_SERNUM_FOR_MAC := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
@@ -130,6 +139,12 @@ BOARD_GPS_LIBRARIES := libloc_api
 TARGET_PROVIDES_LIBLIGHT := true
 
 # Kernel
+# AND is arm-linux-androideabi (used to compile the ROM)
+TARGET_GCC_VERSION_AND := 4.9
+# ARM is arm-eabi (used to compile the kernel)
+#TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex_a8-linux-gnueabi-linaro_4.9.1-2014.06
+#TARGET_KERNEL_CUSTOM_TOOLCHAIN_SUFFIX := arm-eabi-
+#TARGET_GCC_VERSION_ARM := 4.9.1
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.4.3
 TARGET_KERNEL_SOURCE := kernel/huawei/u8800pro
 TARGET_KERNEL_CONFIG := u8800pro_defconfig
@@ -173,9 +188,11 @@ TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 
 TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := ./device/huawei/u8800pro/releasetools/ota_from_target_files
 
+BOARD_HARDWARE_CLASS := device/huawei/u8800pro/cmhw/
+
 # SELinux
 BOARD_SEPOLICY_DIRS := \
-device/huawei/msm7x30-common/sepolicy
+device/huawei/u8800pro/sepolicy
 
 BOARD_SEPOLICY_UNION := \
         file_contexts \

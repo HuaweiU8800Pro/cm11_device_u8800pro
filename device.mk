@@ -61,8 +61,7 @@ PRODUCT_COPY_FILES += \
     device/huawei/u8800pro/prebuilt/etc/AutoVolumeControl.txt:system/etc/AutoVolumeControl.txt \
     device/huawei/u8800pro/prebuilt/etc/audio_policy.conf:system/etc/audio_policy.conf \
     device/huawei/u8800pro/prebuilt/etc/media_codecs.xml:system/etc/media_codecs.xml \
-    device/huawei/u8800pro/prebuilt/20uncapfps:system/etc/init.d/20uncapfps \
-    device/huawei/u8800pro/prebuilt/bcm4329.ko:system/lib/modules/bcm4329.ko 
+    device/huawei/u8800pro/prebuilt/20uncapfps:system/etc/init.d/20uncapfps
     
 # Video and OMX
 PRODUCT_PACKAGES += \
@@ -135,7 +134,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.use_data_netmgrd=true \
     ro.config.ehrpd=true \
     ro.ril.shutdown=true \
-    ro.multi.rild=false
+    ro.multi.rild=false \
+    ro.config.dualmic=true
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -150,11 +150,36 @@ PRODUCT_PACKAGES += \
     
 # Hardware MAC address tool
 PRODUCT_PACKAGES += \
-	hwmac \
+	hwmac
 	
 # Torch
 PRODUCT_PACKAGES += \
 	Torch
+	
+# Build FFMPEG Packages
+PRODUCT_PACKAGES += \
+    libavcodec \
+    libavformat \
+    libswscale \
+    libswresample \
+    libavutil
+    
+# Stagefright FFMPEG plugin
+PRODUCT_PACKAGES += \
+    libstagefright_soft_ffmpegadec \
+    libstagefright_soft_ffmpegvdec \
+    libFFmpegExtractor \
+    libnamparser
+    
+# Wireless AP
+PRODUCT_PACKAGES += \
+    hostapd_cli \
+    hostapd
+    
+# iptables
+PRODUCT_PACKAGES += \
+	iptables \
+	ip6tables
 
 # USB
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -171,11 +196,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.heapstartsize=5m \
     dalvik.vm.heapgrowthlimit=64m \
     dalvik.vm.heapsize=128m \
-    dalvik.vm.dexopt-data-only=0
+    dalvik.vm.dexopt-data-only=1
 
 # system prop for opengles version
 PRODUCT_PROPERTY_OVERRIDES += \
-    debug.composition.type=gpu \
+    debug.composition.type=dyn \
     debug.hwc.fakevsync=1 \
     ro.opengles.version=131072 \
     debug.egl.recordable.rgba8888=1 \
@@ -195,8 +220,17 @@ PRODUCT_PROPERTY_OVERRIDES += \
     wifi.supplicant_scan_interval=15
     
 # Enable transparent status bar in low_ram
-#PRODUCT_PROPERTY_OVERRIDES += \
-#    persist.sys.force_highendgfx=true
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.sys.force_highendgfx=true
+    
+# Disable SELinux
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.boot.selinux=permissive
+    
+# Camera
+PRODUCT_PROPERTY_OVERRIDES += \
+    debug.camera.landscape=true \
+    debug.camcorder.disablemeta=0
     
 # BLUETOOTH
 PRODUCT_COPY_FILES += \

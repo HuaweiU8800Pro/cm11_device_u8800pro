@@ -22,7 +22,7 @@ TARGET_SCREEN_HEIGHT := 800
 TARGET_SCREEN_WIDTH := 480
 
 # Custom tag for unofficial builds
-TARGET_UNOFFICIAL_BUILD_ID := Moihack
+TARGET_UNOFFICIAL_BUILD_ID := CrysisLTU
 
 # Inherit some common CM stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
@@ -35,5 +35,5 @@ $(call inherit-product, device/huawei/u8800pro/full_u8800pro.mk)
 PRODUCT_NAME := cm_u8800pro
 PRODUCT_DEVICE := u8800pro
 PRODUCT_BRAND := Huawei
-PRODUCT_MODEL := IDEOS X5 Pro
+PRODUCT_MODEL := U8800Pro
 PRODUCT_MANUFACTURER := Huawei

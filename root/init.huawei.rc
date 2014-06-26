@@ -65,9 +65,6 @@ write /sys/kernel/mm/ksm/run 1
 
 write /proc/sys/vm/page-cluster 0
 
-# Vibrator intensity control
-    chown system system /sys/class/timed_output/vibrator/voltage_level
-
 #port-bridge
     chmod 0660 /dev/smd0
     chown system system /dev/smd0
@@ -378,13 +375,31 @@ on property:ro.baseband="unknown"
 # Wifi - Tethering
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
+    
+on init
+    # IDEOS X5 Settings
+    chown system system /sys/devices/platform/msm_otg/mode
+    chown system system /sys/devices/platform/msm_hsusb/gadget/manual_chg_current
 
-on property:wlan.driver.status=unloaded
-    start hwmac
+    # Hardware tunables
+    chown root system /sys/class/timed_output/vibrator/voltage_level
+    chmod 0664 /sys/class/timed_output/vibrator/voltage_level
+    restorecon /sys/class/timed_output/vibrator/voltage_level
 
-service hwmac /system/bin/hwmac
+on post-fs-data
+    mkdir /data/misc/sensors 0770 system system
+
+# SDC3 (SDIO) needs to have polling enabled
+on property:wlan.driver.status=loading
+    write /sys/devices/platform/msm_sdcc.3/polling 1
+
+service hwmac /system/bin/hwprops
     class main
     oneshot
+    
+# Reload the MAC address
+on property:wlan.driver.status=unloaded
+    start hwmac
 
 service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
     class main
