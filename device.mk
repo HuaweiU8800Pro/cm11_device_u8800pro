@@ -230,10 +230,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
-    debug.camera.landscape=true \
-    debug.camcorder.disablemeta=0 \
-    ro.media.panorama.defres=3264x1840 \
-    ro.media.enc.jpeg.quality=100
+    debug.camera.landscape=true
     
 # Enable Adaptive Multi-Rate Wideband
 PRODUCT_PROPERTY_OVERRIDES += \
