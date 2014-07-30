@@ -22,7 +22,7 @@ TARGET_SCREEN_HEIGHT := 800
 TARGET_SCREEN_WIDTH := 480
 
 # Custom tag for unofficial builds
-TARGET_UNOFFICIAL_BUILD_ID := CrysisLTU
+TARGET_UNOFFICIAL_BUILD_ID := ash1425
 
 # Inherit some common CM stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
