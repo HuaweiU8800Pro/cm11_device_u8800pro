@@ -38,35 +38,30 @@ static camera_module_t *gVendorModule = 0;
 
 static char **fixed_set_params = NULL;
 
-static int camera_device_open(const hw_module_t* module, const char* name,
-                hw_device_t** device);
-static int camera_device_close(hw_device_t* device);
+static int camera_device_open(const hw_module_t *module, const char *name,
+        hw_device_t **device);
 static int camera_get_number_of_cameras(void);
 static int camera_get_camera_info(int camera_id, struct camera_info *info);
-static int camera_send_command(struct camera_device * device, int32_t cmd,
-                int32_t arg1, int32_t arg2);
 
 static struct hw_module_methods_t camera_module_methods = {
-    .open = camera_device_open
+    open: camera_device_open
 };
 
 camera_module_t HAL_MODULE_INFO_SYM = {
-    .common = {
-         .tag = HARDWARE_MODULE_TAG,
-         .module_api_version = CAMERA_MODULE_API_VERSION_1_0,
-         .hal_api_version = HARDWARE_HAL_API_VERSION,
-         .id = CAMERA_HARDWARE_MODULE_ID,
-         .name = "Xperia msm7x30 Camera Wrapper",
-         .author = "The CyanogenMod Project, Andromadus",
-         .methods = &camera_module_methods,
-         .dso = NULL, /* remove compilation warnings */
-         .reserved = {0}, /* remove compilation warnings */
+    common: {
+         tag: HARDWARE_MODULE_TAG,
+         version_major: 1,
+         version_minor: 0,
+         id: CAMERA_HARDWARE_MODULE_ID,
+         name: "MSM8660 Camera Wrapper",
+         author: "The CyanogenMod Project",
+         methods: &camera_module_methods,
+         dso: NULL, /* remove compilation warnings */
+         reserved: {0}, /* remove compilation warnings */
     },
-    .get_number_of_cameras = camera_get_number_of_cameras,
-    .get_camera_info = camera_get_camera_info,
-    .set_callbacks = NULL, /* remove compilation warnings */
-    .get_vendor_tag_ops = NULL, /* remove compilation warnings */
-    .reserved = {0}, /* remove compilation warnings */
+    get_number_of_cameras: camera_get_number_of_cameras,
+    get_camera_info: camera_get_camera_info,
+    set_callbacks: NULL,
 };
 
 typedef struct wrapper_camera_device {
@@ -102,14 +97,40 @@ static char *camera_fixup_getparams(int id, const char *settings)
     android::CameraParameters params;
     params.unflatten(android::String8(settings));
 
-    params.set("max-saturation", "10");
-    params.set("max-contrast", "10");
-    params.set("max-sharpness", "10");
-
 #if !LOG_NDEBUG
     ALOGV("%s: original parameters:", __FUNCTION__);
     params.dump();
 #endif
+
+    /* Face detection */
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
+
+    params.set(android::CameraParameters::KEY_PREVIEW_FRAME_RATE, "30");
+    params.set(android::CameraParameters::KEY_AUTO_EXPOSURE_LOCK, "false");
+    params.set(android::CameraParameters::KEY_ANTIBANDING, "auto");
+    params.set(android::CameraParameters::KEY_AUTO_EXPOSURE, "frame-average");
+    params.set(android::CameraParameters::KEY_SCENE_DETECT, "on");
+    params.set(android::CameraParameters::KEY_SKIN_TONE_ENHANCEMENT, "enable");
+    params.set(android::CameraParameters::KEY_FOCAL_LENGTH, "3.49");
+    params.set(android::CameraParameters::KEY_FOCUS_DISTANCES, "1.000000,32.000000,32.000000");
+    params.set(android::CameraParameters::KEY_SCENE_DETECT, "on");
+    params.set(android::CameraParameters::KEY_TOUCH_AF_AEC, "touch-on");
+    params.set(android::CameraParameters::KEY_HORIZONTAL_VIEW_ANGLE, "54.4");
+    params.set(android::CameraParameters::KEY_VERTICAL_VIEW_ANGLE, "42.2");
+
+    // Some QCOM related framework changes expect max-saturation, max-contrast
+    // and max-sharpness or the Camera app will crash.
+    const char* value;
+    if((value = params.get("saturation-max"))) {
+        params.set("max-saturation", value);
+    }
+    if((value = params.get("contrast-max"))) {
+        params.set("max-contrast", value);
+    }
+    if((value = params.get("sharpness-max"))) {
+        params.set("max-sharpness", value);
+    }
 
 #if !LOG_NDEBUG
     ALOGV("%s: fixed parameters:", __FUNCTION__);
@@ -122,9 +143,9 @@ static char *camera_fixup_getparams(int id, const char *settings)
     return ret;
 }
 
-char * camera_fixup_setparams(struct camera_device * device, const char * settings)
+static char *camera_fixup_setparams(int id, const char *settings)
 {
-    int id = CAMERA_ID(device);
+    bool isVideo = false;
     android::CameraParameters params;
     params.unflatten(android::String8(settings));
 
@@ -133,11 +154,31 @@ char * camera_fixup_setparams(struct camera_device * device, const char * settin
     params.dump();
 #endif
 
-    bool isVideo = !strcmp(params.get(android::CameraParameters::KEY_RECORDING_HINT), "true");
+    /* Face detection */
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
 
-    if (isVideo) {
-        params.set(android::CameraParameters::KEY_ROTATION, "0");
+    params.set(android::CameraParameters::KEY_PREVIEW_FRAME_RATE, "30");
+    params.set(android::CameraParameters::KEY_AUTO_EXPOSURE_LOCK, "false");
+    params.set(android::CameraParameters::KEY_ANTIBANDING, "auto");
+    params.set(android::CameraParameters::KEY_AUTO_EXPOSURE, "frame-average");
+    params.set(android::CameraParameters::KEY_SCENE_DETECT, "on");
+    params.set(android::CameraParameters::KEY_SKIN_TONE_ENHANCEMENT, "enable");
+    params.set(android::CameraParameters::KEY_FOCAL_LENGTH, "3.49");
+    params.set(android::CameraParameters::KEY_FOCUS_DISTANCES, "1.000000,32.000000,32.000000");
+    params.set(android::CameraParameters::KEY_SCENE_DETECT, "on");
+    params.set(android::CameraParameters::KEY_TOUCH_AF_AEC, "touch-on");
+    params.set(android::CameraParameters::KEY_HORIZONTAL_VIEW_ANGLE, "54.4");
+    params.set(android::CameraParameters::KEY_VERTICAL_VIEW_ANGLE, "42.2");
+
+    // Enable video mode for our HTC camera
+    //   old overlay: needsHtcCamMode
+    //   reference: http://review.cyanogenmod.org/#/c/53595
+    if (params.get(android::CameraParameters::KEY_RECORDING_HINT)) {
+         isVideo = !strcmp(params.get(android::CameraParameters::KEY_RECORDING_HINT), "true");
     }
+
+    params.set("cam-mode", isVideo ? "1" : "0");
 
 #if !LOG_NDEBUG
     ALOGV("%s: fixed parameters:", __FUNCTION__);
@@ -367,7 +408,7 @@ static int camera_set_parameters(struct camera_device *device,
         return -EINVAL;
 
     char *tmp = NULL;
-    tmp = camera_fixup_setparams(device, params);
+    tmp = camera_fixup_setparams(CAMERA_ID(device), params);
 
     int ret = VENDOR_CALL(device, set_parameters, tmp);
     return ret;

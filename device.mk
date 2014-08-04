@@ -135,7 +135,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.ehrpd=true \
     ro.ril.shutdown=true \
     ro.multi.rild=false \
-    ro.config.dualmic=true
+    ro.config.dualmic=true \
+    ro.telephony.call_ring.delay=0
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
