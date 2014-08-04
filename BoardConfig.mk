@@ -140,8 +140,7 @@ TARGET_PROVIDES_LIBLIGHT := true
 
 # Kernel
 # AND is arm-linux-androideabi (used to compile the ROM)
-# Linaro 4.9 causes graphical issues
-TARGET_GCC_VERSION_AND := 4.8.3
+TARGET_GCC_VERSION_AND := 4.9.1
 # ARM is arm-eabi (used to compile the kernel)
 #TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-cortex_a8-linux-gnueabi-linaro_4.9.1-2014.06
 #TARGET_KERNEL_CUSTOM_TOOLCHAIN_SUFFIX := arm-eabi-
